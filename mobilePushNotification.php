@@ -4,6 +4,8 @@
 // ISO: APNS Token
 // You can get Token with lib firebase, expo-notification...
 // Now....start
+class pushNotification {
+	
 	function createNoti($token, $title, $content)
     {
         (strpos($token, ":")!==false)?$this-> FCM_send($token,$title,$content):$this-> APNS_send($token,$title,$content);
@@ -97,3 +99,4 @@
 		];
      $this-> httpPostJsonHeader($url,$headers, json_encode($data));
     }
+}
