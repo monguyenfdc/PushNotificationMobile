@@ -99,4 +99,28 @@ class pushNotification {
 		];
      $this-> httpPostJsonHeader($url,$headers, json_encode($data));
     }
+	function FCM_send_Via_HTTPv1($token,$title,$mess){
+		$apiKey="AAAAX3e0lxQ:AFHAJFSHADJFSDFJSDFDFigawpeIEWcm0mMEBwBeR..."; // => FCM KEY from firebase
+        	$url = "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send";
+		
+		$notification = array(
+		    "title" => $title,
+		    "body" => $body,
+		    "data" => $mess,		    
+		);
+		
+		// Tạo yêu cầu
+		$request = array(
+		    "to" => $token,
+		    "notification" => $notification,
+		);
+		
+		// Gửi yêu cầu
+		$headers = array(
+		    "Authorization: Bearer " . $apiKey,
+		    "Content-Type: application/json",
+		);
+		 $this-> httpPostJsonHeader($url,$headers, json_encode($request));
+	}
 }
+
