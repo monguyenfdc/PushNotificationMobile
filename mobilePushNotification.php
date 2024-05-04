@@ -99,28 +99,96 @@ class pushNotification {
 		];
      $this-> httpPostJsonHeader($url,$headers, json_encode($data));
     }
-	function FCM_send_Via_HTTPv1($token,$title,$mess){
-		$apiKey="AAAAX3e0lxQ:AFHAJFSHADJFSDFJSDFDFigawpeIEWcm0mMEBwBeR..."; // => FCM KEY from firebase
-        	$url = "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send";
-		
-		$notification = array(
-		    "title" => $title,
-		    "body" => $body,
-		    "data" => $mess,		    
-		);
+	
+    function getAccessTokenHTTPv1(){
+    // Read service account details
+        $adr='./<DIR>/';
+        $privatekey="your-privite-key.json";
+        $authConfigString = file_get_contents($adr.$privatekey);
+
+        // Parse service account details
+        $authConfig = json_decode($authConfigString);
+
+        // Read private key from service account details
+        $secret = openssl_get_privatekey($authConfig->private_key);
+
+        // Create the token header
+        $header = json_encode([
+            'typ' => 'JWT',
+            'alg' => 'RS256'
+        ]);
+
+        // Get seconds since 1 January 1970
+        $time = time();
+
+        $payload = json_encode([
+            "iss" => $authConfig->client_email,
+            "scope" => "https://www.googleapis.com/auth/firebase.messaging",
+            "aud" => "https://oauth2.googleapis.com/token",
+            "exp" => $time + 3600,
+            "iat" => $time
+        ]);
+
+        // Encode Header
+        $base64UrlHeader = $this->b64(($header);
+
+        // Encode Payload
+        $base64UrlPayload = $this->b64(($payload);
+
+        // Create Signature Hash
+        $signature='';
+        openssl_sign($base64UrlHeader . "." . $base64UrlPayload, $signature, $secret, OPENSSL_ALGO_SHA256);
+
+        // Encode Signature to Base64Url String
+        $base64UrlSignature = $this->b64(($signature);
+
+        // Create JWT
+        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+
+        //-----Request token------
+        $options = array('http' => array(
+            'method'  => 'POST',
+            'content' => 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion='.$jwt,
+            'header'  =>
+                "Content-Type: application/x-www-form-urlencoded"
+        ));
+        $context  = stream_context_create($options);
+        $responseText = file_get_contents("https://oauth2.googleapis.com/token", false, $context);
+        file_put_contents($adr.'access_token.json',$responseText);
+        return($responseText);
+    }
+
+
+    function FCM_send_Via_HTTPv1($token,$title,$mess){
+        $adr='./<DIR>/';
+        $access_token=file_exists($adr.'access_token.json')?json_decode(file_get_contents($adr.'access_token.json'),true):json_decode($this->getAccessTokenHTTPv1(),true);
+        $url = "https://fcm.googleapis.com/v1/projects/succons-a48f0/messages:send";
 		
 		// Tạo yêu cầu
-		$request = array(
-		    "to" => $token,
-		    "notification" => $notification,
-		);
+	$request = [
+	"message"=>[
+		"token" => $token,
+		"notification" => [
+		    "title" => $title,
+		    "body" => $mess,
+		]
+	    ]
+	];		
+	// Gửi yêu cầu
+	$headers = array(
+	    "Authorization: Bearer " . $access_token['access_token'],
+	    "Content-Type: application/json; UTF-8",
+	);
 		
-		// Gửi yêu cầu
+        $result=json_decode(httpPostJsonHeader($url,$headers, json_encode($request)), true);
+        if(isset($result['error'])&&$result['error']['code']=='401'){
+		$access_token=json_decode($this-> getAccessTokenHTTPv1(),true);
 		$headers = array(
-		    "Authorization: Bearer " . $apiKey,
-		    "Content-Type: application/json",
-		);
-		 $this-> httpPostJsonHeader($url,$headers, json_encode($request));
+			    "Authorization: Bearer " . $access_token['access_token'],
+			    "Content-Type: application/json; UTF-8",
+			    );
+		httpPostJsonHeader($url,$headers, json_encode($request));
+        	}
 	}
 }
 
