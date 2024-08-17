@@ -1,26 +1,47 @@
+
 # PushNotificationMobile
- Creact notification to mobile app with PHP on your server
- Function push notification server to mobile app with diver token
- Android: FCM Token
- IOS: APNS Token
- You can get Driver-token with lib firebase, expo-notification...
 
-# To used:
-createNoti($token, $title, $content)
+This project enables sending push notifications to a mobile app using PHP on your server. It supports push notifications for both Android and iOS devices through different token types.
 
-# information need to creact:
-# IOS: PHP push notification with APNS
-	$authKey = "AuthKey_<ADASDASD>.p8"; 	// => Name .p8 file
-	$teamId = 'HAHASDHAD';					// => team ID from account developer
-	$tokenId = 'ADASDASD';					// => key .p8 ID
-	$bundleId = 'com.abc.abc';				// => Bundle ID from App
- 
-# Android: 
-# PHP push notification with FCM
- 	$key="AAAAX3e0lxQ:AFHAJFSHADJFSDFJSDFDFigawpeIEWcm0mMEBwBeR..."; // => FCM KEY from firebase
-# PHP push notification with HTTPv1
-	step1: Generate `privite key` in `service account`
- 	step2: Save privite_key.json on your server
-  	step3: replace in code: $adr='Adress folder';
-        			$privatekey="your_privite_key.json";
-Good luck !
+## Features
+- Push notifications to mobile apps using server-side PHP.
+- Supports Android (FCM Token) and iOS (APNS Token).
+- Retrieve device tokens using libraries like Firebase or Expo-Notification.
+
+## Usage
+
+To send a notification, use the following function:
+
+\`\`\`php
+$push= new pushNotification();
+$push->createNoti($token, $title, $content);
+\`\`\`
+
+## Required Information
+
+### iOS: PHP Push Notifications with APNS
+
+To set up push notifications for iOS devices, you'll need:
+
+- \`$authKey\`: The .p8 file, e.g., "AuthKey_<KEY_ID>.p8".
+- \`$teamId\`: Your Apple Developer Team ID, e.g., 'HAHASDHAD'.
+- \`$tokenId\`: The ID of your .p8 key, e.g., 'ADASDASD'.
+- \`$bundleId\`: The Bundle ID of your app, e.g., 'com.abc.abc'.
+
+### Android: PHP Push Notifications with FCM
+
+To set up push notifications for Android devices, you'll need:
+
+- \`$key\`: The FCM Key from Firebase, e.g., "AAAAX3e0lxQ:AFHAJFSHADJFSDFJSDFDFigawpeIEWcm0mMEBwBeR...".
+
+### PHP Push Notifications with HTTPv1 (Android)
+
+1. Generate a \`private key\` in your Firebase Service Account.
+2. Save the \`private_key.json\` file on your server.
+3. Update your code with the following:
+   \`\`\`php
+   $adr = 'Address folder';
+   $privatekey = 'your_private_key.json';
+   \`\`\`
+
+Good luck!
